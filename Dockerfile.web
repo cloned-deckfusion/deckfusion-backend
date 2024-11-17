@@ -1,0 +1,14 @@
+# Use the backend base image
+FROM backend_base
+
+# Set entrypoint
+ENTRYPOINT ["/usr/local/bin/web.sh"]
+
+# Switch to non-root user
+USER appuser
+
+# Expose the application port
+EXPOSE 8001
+
+# Run command
+CMD ["gunicorn", "-c", "python:config.gunicorn", "config.wsgi:application"]

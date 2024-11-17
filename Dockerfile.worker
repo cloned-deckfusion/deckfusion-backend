@@ -1,0 +1,11 @@
+# Use the backend base image
+FROM backend_base
+
+# Set entrypoint
+ENTRYPOINT ["/usr/local/bin/worker.sh"]
+
+# Switch to non-root user
+USER appuser
+
+# Run command
+CMD ["celery", "-A", "config", "worker", "-l", "info"]

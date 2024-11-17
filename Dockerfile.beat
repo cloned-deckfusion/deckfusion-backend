@@ -1,0 +1,11 @@
+# Use the backend base image
+FROM backend_base
+
+# Set entrypoint
+ENTRYPOINT ["/usr/local/bin/beat.sh"]
+
+# Switch to non-root user
+USER appuser
+
+# Run command
+CMD ["celery", "-A", "config", "beat", "-l", "info", "--scheduler", "django_celery_beat.schedulers:DatabaseScheduler"]
