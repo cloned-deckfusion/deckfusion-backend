@@ -117,8 +117,8 @@ class User(AbstractUser):
     # Set username field to email
     USERNAME_FIELD = "email"
 
-    # Make first name required
-    REQUIRED_FIELDS = ["first_name"]
+    # Define required fields
+    REQUIRED_FIELDS = []
 
     # ┌─────────────────────────────────────────────────────────────────────────────────
     # │ MODEL MANAGER
