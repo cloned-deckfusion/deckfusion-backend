@@ -294,7 +294,7 @@ if ENABLE_BROWSABLE_API:
 # └─────────────────────────────────────────────────────────────────────────────────────
 
 # Retrieve Redis URL from .env
-REDIS_URL = config("REDIS_URL", default="redis://redis:6379/0")
+REDIS_URL = config("REDIS_URL", default="redis://deckfusion-backend-kv:6379/0")
 
 # Set Redis broker settings
 BROKER_URL = REDIS_URL

@@ -61,7 +61,7 @@ class EarlyAccessView(APIView):
         email = serializer.validated_data["email"]
 
         # Get or create user
-        user, created = User.objects.get_or_create(email=email)
+        _, created = User.objects.get_or_create(email=email)
 
         # Get status
         _status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
