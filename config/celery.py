@@ -3,7 +3,8 @@
 # └─────────────────────────────────────────────────────────────────────────────────────
 
 import os
-import scout_apm.celery
+
+# import scout_apm.celery
 import ssl
 
 # ┌─────────────────────────────────────────────────────────────────────────────────────
@@ -32,7 +33,7 @@ app = Celery(
 app.config_from_object("django.conf:settings")
 
 # Intall Scout Celery
-scout_apm.celery.install(app)
+# scout_apm.celery.install(app)
 
 # Load tasks from all registered apps
 app.autodiscover_tasks()
