@@ -2,53 +2,42 @@
 # │ DJANGO IMPORTS
 # └─────────────────────────────────────────────────────────────────────────────────────
 
-from django.urls import path
-from dynamic_rest.routers import DynamicRouter
-from rest_framework_nested.routers import NestedDefaultRouter
+from django.contrib import admin
 
 # ┌─────────────────────────────────────────────────────────────────────────────────────
 # │ PROJECT IMPORTS
 # └─────────────────────────────────────────────────────────────────────────────────────
 
-from landing.views import ContactView, EarlyAccessView
-from user.views import UserViewSet
+from landing.models import ContactMessage
 
 
 # ┌─────────────────────────────────────────────────────────────────────────────────────
-# │ API ROUTER
+# │ EXCHANGE ADMIN
 # └─────────────────────────────────────────────────────────────────────────────────────
 
-# api_root (/)
-router = DynamicRouter()
+
+class ContactMessageAdmin(admin.ModelAdmin):
+    """Contact Message Admin"""
+
+    # ┌─────────────────────────────────────────────────────────────────────────────────
+    # │ CLASS ATTRIBUTES
+    # └─────────────────────────────────────────────────────────────────────────────────
+
+    # Define list display
+    list_display = [
+        "id",
+        "user",
+    ]
+
+    # Define list display links
+    list_display_links = ["id", "user"]
+
+    # Define search fields
+    search_fields = ["user__first_name", "user__last_name", "user__email", "text"]
+
 
 # ┌─────────────────────────────────────────────────────────────────────────────────────
-# │ USER
+# │ REGISTER
 # └─────────────────────────────────────────────────────────────────────────────────────
 
-# users/
-router.register("users", UserViewSet, base_name="users")
-
-# Define users router
-users_router = NestedDefaultRouter(router, "users", lookup="user")
-
-# ┌────────────────────────────────────────────────────────────────────────────────────┐
-# │ URL PATTERNS                                                                       │
-# └────────────────────────────────────────────────────────────────────────────────────┘
-
-# Initialize URL patterns list
-urlpatterns = [
-    path("landing/early-access/", EarlyAccessView.as_view(), name="early_access"),
-    path("landing/contact/", ContactView.as_view(), name="contact"),
-]
-
-# Define router URLs
-router_urls = [
-    # Router urls
-    router.urls,
-    # Nested router urls
-    users_router.urls,
-]
-
-# Concatenate all lists
-for router_url in router_urls:
-    urlpatterns += router_url
+admin.site.register(ContactMessage, ContactMessageAdmin)

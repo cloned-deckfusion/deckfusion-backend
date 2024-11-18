@@ -98,6 +98,7 @@ INSTALLED_APPS = [
     # Channels
     "channels",
     # Project
+    "landing",
     "user",
 ]
 
