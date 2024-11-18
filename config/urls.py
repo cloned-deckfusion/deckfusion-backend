@@ -4,7 +4,7 @@
 
 from django.conf import settings
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 
 
 # ┌─────────────────────────────────────────────────────────────────────────────────────
@@ -12,7 +12,12 @@ from django.urls import path
 # └─────────────────────────────────────────────────────────────────────────────────────
 
 # Define URL patterns
-urlpatterns = []
+urlpatterns = [
+    # DRF Endpoints
+    path("api-auth/", include("rest_framework.urls")),
+    # API Endpoints
+    path("api/", include("api.endpoints")),
+]
 
 # ┌─────────────────────────────────────────────────────────────────────────────────────
 # │ DJANGO ADMIN

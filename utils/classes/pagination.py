@@ -1,76 +1,72 @@
 # ┌─────────────────────────────────────────────────────────────────────────────────────
-# │ DJANGO IMPORTS
+# │ DJANGO REST FRAMEWORK IMPORTS
 # └─────────────────────────────────────────────────────────────────────────────────────
 
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-from rest_framework.views import APIView
-
-# ┌─────────────────────────────────────────────────────────────────────────────────────
-# │ PROJECT IMPORTS
-# └─────────────────────────────────────────────────────────────────────────────────────
-
-from user.models import User
-from user.serializers import UserEmailSerializer
+from dynamic_rest.pagination import DynamicPageNumberPagination
+from rest_framework.exceptions import NotFound
 
 
 # ┌─────────────────────────────────────────────────────────────────────────────────────
-# │ EARLY ACCESS VIEW
+# │ DYNAMIC PAGINATION
 # └─────────────────────────────────────────────────────────────────────────────────────
 
 
-class EarlyAccessView(APIView):
-    """Early Access View"""
+class DynamicPagination(DynamicPageNumberPagination):
+    """A dynamic pagination class for querysets"""
 
     # ┌─────────────────────────────────────────────────────────────────────────────────
     # │ CLASS ATTRIBUTES
     # └─────────────────────────────────────────────────────────────────────────────────
 
-    # Define permission classes
-    permission_classes = [AllowAny]
+    # Define page size and max page size
+    page_size = 20
+    max_page_size = 1000
+
+    # Define page query params
+    page_query_param = "page"
+    page_size_query_param = "page_size"
 
     # ┌─────────────────────────────────────────────────────────────────────────────────
-    # │ GET SERIALIZER CLASS
+    # │ GET PAGE METADATA
     # └─────────────────────────────────────────────────────────────────────────────────
 
-    def get_serializer_class(self):
-        """Get Serializer Class Method"""
+    def get_page_metadata(self):
+        """Constructs the metadata for the paginated response"""
 
-        # Return serializer
-        return UserEmailSerializer
+        # Return page metadata
+        return {
+            self.page_query_param: self.page.number,
+            self.page_size_query_param: self.get_page_size(self.request),
+            "page_count": self.page.paginator.num_pages,
+            "result_count": self.page.paginator.count,
+        }
 
     # ┌─────────────────────────────────────────────────────────────────────────────────
-    # │ POST
+    # │ GET PAGE NUMBER
     # └─────────────────────────────────────────────────────────────────────────────────
 
-    def post(self, request, *args, **kwargs):
-        """Post Method"""
+    def get_page_number(self, request, paginator):
+        """Get Page Number Method"""
 
-        # Get serializer class
-        SerializerClass = self.get_serializer_class()
+        # Get the original page number from the request
+        page_number = request.query_params.get(self.page_query_param, 1)
 
-        # Get serializer
-        serializer = SerializerClass(data=request.data)
+        # Initialize try-except block
+        try:
+            # Convert page number to integer
+            page_number = int(page_number)
 
-        # Check if serializer is not valid
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Handle ValueError
+        except ValueError:
+            raise NotFound("Page number must be an integer.")
 
-        # Get email
-        email = serializer.validated_data["email"]
+        # Handle negative page number "indexes"
+        if page_number < 0:
+            page_number = paginator.num_pages + page_number + 1
 
-        # Get or create user
-        user, created = User.objects.get_or_create(email=email)
+        # Ensure the page number is valid
+        if page_number < 1 or page_number > paginator.num_pages:
+            raise NotFound("Page number out of range.")
 
-        # Get status
-        _status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
-
-        # Get message
-        message = "User created" if created else "User exists"
-
-        # Return response
-        return Response(
-            {"message": message},
-            status=_status,
-        )
+        # Return page number
+        return page_number
