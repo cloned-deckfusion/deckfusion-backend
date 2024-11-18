@@ -165,7 +165,7 @@ else:
 
     # Get database credentials
     database_engine = "django.db.backends.postgresql_psycopg2"
-    database_name = config("BACKEND_DATABASE_NAME", default="dalpha")
+    database_name = config("BACKEND_DATABASE_NAME", default="deckfusion")
     database_user = config("BACKEND_DATABASE_USER", default="postgres")
     database_password = config("BACKEND_DATABASE_PASSWORD", "postgres")
     database_host = config("BACKEND_DATABASE_HOST", default="backend_db")
